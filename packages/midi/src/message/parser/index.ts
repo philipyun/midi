@@ -1,10 +1,19 @@
-import { parseRawChannelVoiceMessage } from '../channel/voice';
+import { MIDIJsError } from '@philipyun-midi/midi/common/error';
 import { normalizeUInt7 } from '../utils';
-import { ChannelModeMessage, ChannelVoiceMessage, MIDIMessagePrefixMap, RawMidiMessage } from '../utils/types';
+import { UInt7 } from '../utils/ranges';
 import {
+  ChannelModeMessage,
+  ChannelModeType,
+  ChannelVoiceMessage,
+  MIDIMessagePrefixMap,
+  RawMidiMessage,
+} from '../utils/types';
+import {
+  data1ByteIsChannelModeController,
   validateChannelVoicePrefix,
   validateChannelWord,
   validateData1Byte,
+  validateData2Byte,
   validateMIDIPrefix,
   validateStatusByte,
 } from './validate';
@@ -27,6 +36,28 @@ const parseRawMIDIMessage = (status: number, data1Byte?: number, data2Byte?: num
 
 const parseSystemMessage = (rawMessage: Uint8Array) => {};
 
+const parseChannelModeMessageType = (data1Byte: UInt7): ChannelModeType => {
+  if (data1Byte >= 120 && data1Byte <= 127) {
+    switch (data1Byte) {
+      case 120:
+        return 'all-sound-off';
+      case 121:
+        return 'reset-all-controllers';
+      case 122:
+        return 'local-control';
+      case 123:
+      case 124:
+      case 125:
+      case 126:
+      case 127:
+        return 'all-notes-off';
+      default:
+        throw new MIDIJsError('parseChannelModeMessageType', 'This technically should have never happened...');
+    }
+  }
+  throw new MIDIJsError('parseChannelModeMessageType', 'The data1 byte is not a valid channel mode message controller');
+};
+
 const parseChannelMessage = (rawMIDIMessage: RawMidiMessage): ChannelVoiceMessage | ChannelModeMessage => {
   const channelVoicePrefix = validateChannelVoicePrefix(rawMIDIMessage.status);
   const channelMessageType = MIDIMessagePrefixMap[channelVoicePrefix];
@@ -39,14 +70,14 @@ const parseChannelMessage = (rawMIDIMessage: RawMidiMessage): ChannelVoiceMessag
   // check if its a CC Message Prefix, since control change messages can be channel mode
   if (channelMessageType === 'control-change') {
     // now check if data1 is between 120-127, if we are, we're a channel mode message
-    if (data1Byte >= 120 && data1Byte <= 127) {
-      // TODO
+    if (data1ByteIsChannelModeController(data1Byte)) {
+      const channelModeData2Byte = validateData2Byte(rawMIDIMessage);
       return {
         channel,
         category: 'channel-mode',
-        data1: 120,
-        data2: 0,
-        type: 'all-notes-off',
+        data1: data1Byte,
+        data2: channelModeData2Byte,
+        type: parseChannelModeMessageType(data1Byte),
       };
     }
   }
