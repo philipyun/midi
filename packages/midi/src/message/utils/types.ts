@@ -74,3 +74,5 @@ export interface ChannelModeMessage extends BaseMidiMessage<'channel-mode'> {
   data1: ChannelModeController;
   data2: UInt7;
 }
+
+export type MIDIMessage = ChannelVoiceMessage | ChannelModeMessage;

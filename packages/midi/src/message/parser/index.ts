@@ -5,6 +5,7 @@ import {
   ChannelModeMessage,
   ChannelModeType,
   ChannelVoiceMessage,
+  MIDIMessage,
   MIDIMessagePrefixMap,
   RawMidiMessage,
 } from '../utils/types';
@@ -34,7 +35,9 @@ const parseRawMIDIMessage = (status: number, data1Byte?: number, data2Byte?: num
   };
 };
 
-const parseSystemMessage = (rawMessage: Uint8Array) => {};
+const parseSystemMessage = (rawMessage: Uint8Array) => {
+  return null as unknown as MIDIMessage;
+};
 
 const parseChannelModeMessageType = (data1Byte: UInt7): ChannelModeType => {
   if (data1Byte >= 120 && data1Byte <= 127) {

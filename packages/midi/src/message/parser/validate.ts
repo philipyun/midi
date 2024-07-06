@@ -51,8 +51,9 @@ export const validateData2Byte = (rawMessage: RawMidiMessage): UInt7 => {
 const channelIsMidiChannel = (channel: number): channel is MIDIChannel => channel >= 0 && channel <= 15;
 
 export const validateChannelWord = (channel: number): MIDIChannel => {
-  if (channelIsMidiChannel(channel)) {
-    return channel;
+  const offsetChannel = channel + 1;
+  if (channelIsMidiChannel(offsetChannel)) {
+    return offsetChannel;
   }
   throw new MIDIJsError('validateChannelWord', 'midi channel is not valid -- but this should have never happened');
 };

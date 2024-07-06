@@ -1,4 +1,4 @@
-import { ChannelVoiceMessage, MIDIMessageTypeMap } from '../utils/types';
+import { ChannelModeMessage, ChannelVoiceMessage, MIDIMessage, MIDIMessageTypeMap } from '../utils/types';
 import { normalizeChannel, normalizeUInt8 } from '../utils';
 import { RawMidiMessage } from '../utils/types';
 
@@ -14,7 +14,7 @@ const serializeRawMIDIMessage = (message: RawMidiMessage): Uint8Array => {
   return new Uint8Array(filteredArray);
 };
 
-export const serializeChannelVoiceMessage = (message: ChannelVoiceMessage): Uint8Array => {
+const serializeChannelVoiceMessage = (message: ChannelVoiceMessage): Uint8Array => {
   const prefixByte = MIDIMessageTypeMap[message.type] << 4;
   const channelByte = normalizeChannel(message.channel);
   const statusByte = prefixByte | channelByte;
@@ -24,4 +24,25 @@ export const serializeChannelVoiceMessage = (message: ChannelVoiceMessage): Uint
     data1: message.data1,
     data2: message.data2,
   });
+};
+
+const serializeChannelModeMessage = (message: ChannelModeMessage): Uint8Array => {
+  const prefixByte = MIDIMessageTypeMap['control-change'] << 4;
+  const channelByte = normalizeChannel(message.channel);
+  const statusByte = prefixByte | channelByte;
+
+  return serializeRawMIDIMessage({
+    status: statusByte,
+    data1: message.data1,
+    data2: message.data2,
+  });
+};
+
+export const serializeMIDIMessage = (message: MIDIMessage): Uint8Array => {
+  switch (message.category) {
+    case 'channel-mode':
+      return serializeChannelModeMessage(message);
+    case 'channel-voice':
+      return serializeChannelVoiceMessage(message);
+  }
 };
