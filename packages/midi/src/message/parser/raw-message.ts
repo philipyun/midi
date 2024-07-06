@@ -1,6 +1,6 @@
-import { MIDIJsError } from '../../common/error';
-import { normalizeByte } from '../common';
-import { RawMidiMessage } from '../types';
+import { normalizeUInt7, normalizeUInt8 } from '../utils';
+import { RawMidiMessage } from '../utils/types';
+import { validateStatusByte } from './validate';
 
 /**
  * parses and converts a Uint8Array formatted MIDI message into a RawMidiMessage
@@ -8,14 +8,14 @@ import { RawMidiMessage } from '../types';
  * @returns - RawMidiMessage format
  */
 export const parseRawMIDIMessage = (message: Uint8Array): RawMidiMessage => {
-  if (message[0] === undefined) {
-    throw new MIDIJsError('parseRawMIDIMessage', 'bad message input');
-  }
+  const status = validateStatusByte(message);
+  const data1 = message[1] !== undefined ? normalizeUInt7(message[1]) : undefined;
+  const data2 = message[2] !== undefined ? normalizeUInt7(message[2]) : undefined;
 
   return {
-    status: message[0],
-    data1: message[1],
-    data2: message[2],
+    status,
+    data1,
+    data2,
   };
 };
 
@@ -25,11 +25,8 @@ export const parseRawMIDIMessage = (message: Uint8Array): RawMidiMessage => {
  * @returns serialized MIDI Message in Uint8Array format
  */
 export const serializeRawMIDIMessage = (message: RawMidiMessage): Uint8Array => {
-  const dataArray = [
-    normalizeByte(message.status),
-    message.data1 !== undefined ? normalizeByte(message.data1) : null,
-    message.data2 !== undefined ? normalizeByte(message.data2) : null,
-  ].filter(item => item !== null);
+  const dataArray = [normalizeUInt8(message.status), message.data1 ?? null, message.data2 ?? null];
+  const filteredArray = dataArray.filter(item => item !== null);
 
-  return new Uint8Array(dataArray);
+  return new Uint8Array(filteredArray);
 };
