@@ -1,4 +1,5 @@
 import { MIDIJsError } from '../../common/error';
+import { normalizeChannel } from '../common';
 import { RawMidiMessage } from '../common/types';
 import { serializeRawMIDIMessage } from '../parser/raw-message';
 import {
@@ -44,8 +45,8 @@ export const parseRawChannelVoiceMessage = (message: RawMidiMessage): ChannelVoi
 
 export const serializeChannelVoiceMessage = (message: ChannelVoiceMessage): Uint8Array => {
   const prefixByte = ChannelVoiceTypeMap[message.type] << 4;
-  const channelByte = message.channel;
-  const statusByte = prefixByte & channelByte;
+  const channelByte = normalizeChannel(message.channel);
+  const statusByte = prefixByte | channelByte;
 
   return serializeRawMIDIMessage({
     status: statusByte,
