@@ -1,20 +1,11 @@
-export type MIDIMessageCategory = 'channel-voice' | 'channel-mode' | 'system-common' | 'system-real-time';
-
 /**
- * Human readable midi message type
+ * normalizes a number to ensure it cannot be a higher value than 0xFF
+ * @param number - number to normalize
+ * @returns number formatted to one byte
  */
-export interface BaseMidiMessage<C extends MIDIMessageCategory> {
-  type: string;
-  category: C;
-  data1?: number;
-  data2?: number;
-}
-
-/**
- * JSON breakdown of midi message bytes
- */
-export interface RawMidiMessage {
-  status: number;
-  data1?: number;
-  data2?: number;
-}
+export const normalizeByte = (number: number) => {
+  if (number > 0xff) {
+    return 0xff;
+  }
+  return number;
+};

@@ -1,4 +1,6 @@
-import { RawMidiMessage } from '../common';
+import { MIDIJsError } from '../../common/error';
+import { normalizeByte } from '../common';
+import { RawMidiMessage } from '../common/types';
 
 /**
  * parses and converts a Uint8Array formatted MIDI message into a RawMidiMessage
@@ -7,7 +9,7 @@ import { RawMidiMessage } from '../common';
  */
 export const parseRawMIDIMessage = (message: Uint8Array): RawMidiMessage => {
   if (message[0] === undefined) {
-    throw new Error('midi.js: parseMIDIMessageToRaw::bad message.');
+    throw new MIDIJsError('parseRawMIDIMessage', 'bad message input');
   }
 
   return {
@@ -15,18 +17,6 @@ export const parseRawMIDIMessage = (message: Uint8Array): RawMidiMessage => {
     data1: message[1],
     data2: message[2],
   };
-};
-
-/**
- * normalizes a number to ensure it cannot be a higher value than 0xFF
- * @param number - number to normalize
- * @returns number formatted to one byte
- */
-const normalizeByte = (number: number) => {
-  if (number > 0xff) {
-    return 0xff;
-  }
-  return number;
 };
 
 /**
