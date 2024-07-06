@@ -1,16 +1,16 @@
 import { MIDIJsError } from '../../common/error';
 import { normalizeChannel } from '../common';
-import { RawMidiMessage } from '../common/types';
+import { RawMidiMessage } from '../types';
 import { serializeRawMIDIMessage } from '../parser/raw-message';
 import {
   ChannelVoiceMessage,
-  ChannelVoicePrefix,
-  ChannelVoicePrefixMap,
-  ChannelVoiceTypeMap,
+  MIDIMessagePrefix,
+  MIDIMessagePrefixMap,
+  MIDIMessageTypeMap,
   MIDIChannel,
-} from './types';
+} from '../types';
 
-const prefixIsChannelVoice = (prefix: number): prefix is ChannelVoicePrefix => {
+const prefixIsChannelVoice = (prefix: number): prefix is MIDIMessagePrefix => {
   return prefix >= 0b1000 && prefix <= 0b1110;
 };
 
@@ -36,7 +36,7 @@ export const parseRawChannelVoiceMessage = (message: RawMidiMessage): ChannelVoi
 
   return {
     category: 'channel-voice',
-    type: ChannelVoicePrefixMap[statusPrefix],
+    type: MIDIMessagePrefixMap[statusPrefix],
     channel,
     data1: message.data1,
     data2: message.data2,
@@ -44,7 +44,7 @@ export const parseRawChannelVoiceMessage = (message: RawMidiMessage): ChannelVoi
 };
 
 export const serializeChannelVoiceMessage = (message: ChannelVoiceMessage): Uint8Array => {
-  const prefixByte = ChannelVoiceTypeMap[message.type] << 4;
+  const prefixByte = MIDIMessageTypeMap[message.type] << 4;
   const channelByte = normalizeChannel(message.channel);
   const statusByte = prefixByte | channelByte;
 

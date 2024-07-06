@@ -1,4 +1,4 @@
-import { MIDIChannel } from '../channel-voice/types';
+import { MIDIChannel } from '../types';
 
 /**
  * normalizes a number to ensure it cannot be a higher value than 0xFF

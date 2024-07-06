@@ -1,6 +1,6 @@
 import { MIDIJsError } from '../../common/error';
 import { normalizeByte } from '../common';
-import { RawMidiMessage } from '../common/types';
+import { RawMidiMessage } from '../types';
 
 /**
  * parses and converts a Uint8Array formatted MIDI message into a RawMidiMessage
