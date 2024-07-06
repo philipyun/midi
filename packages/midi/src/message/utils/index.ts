@@ -1,5 +1,5 @@
-import { MIDIChannel } from './types';
 import { UInt7, UInt8 } from './ranges';
+import { MIDIChannel } from './types';
 
 /**
  * normalizes a number to ensure it cannot be a higher value than 0xFF

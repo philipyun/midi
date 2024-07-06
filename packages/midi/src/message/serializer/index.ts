@@ -1,5 +1,5 @@
-import { ChannelModeMessage, ChannelVoiceMessage, MIDIMessage, MIDIMessageTypeMap } from '../utils/types';
 import { normalizeChannel, normalizeUInt8 } from '../utils';
+import { ChannelModeMessage, ChannelVoiceMessage, MIDIMessage, MIDIMessageTypeMap } from '../utils/types';
 import { RawMidiMessage } from '../utils/types';
 
 /**
