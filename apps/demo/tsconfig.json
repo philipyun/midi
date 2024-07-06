@@ -12,7 +12,9 @@
     "next.config.js",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "../../packages/midi/src/**/*",
+    "../../packages/react-midi/src/**/*"
   ],
   "exclude": ["node_modules"]
 }

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@philipyun-midi/midi": "*",
+    "@philipyun-midi/react-midi": "*",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "next": "14.2.4"
