@@ -26,7 +26,6 @@ export const MIDIProvider: React.FC<MIDIContextProps> = ({ children }) => {
       setMidiPorts(access);
     };
     init();
-    requestMIDIAccess();
   }, []);
 
   const contextValue: MIDIContextValue = {
