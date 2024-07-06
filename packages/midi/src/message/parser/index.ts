@@ -1,12 +1,27 @@
 import { parseRawChannelVoiceMessage } from '../channel/voice';
-import { MIDIMessagePrefixMap } from '../utils/types';
-import { parseRawMIDIMessage } from './raw-message';
+import { normalizeUInt7 } from '../utils';
+import { MIDIMessagePrefixMap, RawMidiMessage } from '../utils/types';
 import { validateData1Byte, validateMIDIPrefix, validateStatusByte } from './validate';
+
+/**
+ * parses and converts a Uint8Array formatted MIDI message into a RawMidiMessage
+ * @param message - Uint8Array received from midi input
+ * @returns - RawMidiMessage format
+ */
+const parseRawMIDIMessage = (status: number, data1Byte?: number, data2Byte?: number): RawMidiMessage => {
+  const data1 = data1Byte !== undefined ? normalizeUInt7(data1Byte) : undefined;
+  const data2 = data2Byte !== undefined ? normalizeUInt7(data2Byte) : undefined;
+
+  return {
+    status,
+    data1,
+    data2,
+  };
+};
 
 const parseSystemMessage = (rawMessage: Uint8Array) => {};
 
-const parseChannelMessage = (rawMessage: Uint8Array) => {
-  const rawMIDIMessage = parseRawMIDIMessage(rawMessage);
+const parseChannelMessage = (rawMIDIMessage: RawMidiMessage) => {
   const midiPrefix = validateMIDIPrefix(rawMIDIMessage.status);
   const midiMessageType = MIDIMessagePrefixMap[midiPrefix];
 
@@ -29,5 +44,6 @@ export const parseMIDIMessage = (rawMessage: Uint8Array) => {
   if (midiMessageType === 'system') {
     return parseSystemMessage(rawMessage);
   }
-  return parseChannelMessage(rawMessage);
+  const rawMIDIMessage = parseRawMIDIMessage(statusByte, rawMessage[1], rawMessage[2]);
+  return parseChannelMessage(rawMIDIMessage);
 };

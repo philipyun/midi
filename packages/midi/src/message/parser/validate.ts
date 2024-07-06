@@ -1,12 +1,6 @@
 import { MIDIJsError } from '../../common/error';
 import { UInt7 } from '../utils/ranges';
-import {
-  ChannelVoiceMessage,
-  ChannelVoicePrefix,
-  MIDIChannel,
-  MIDIMessagePrefix,
-  RawMidiMessage,
-} from '../utils/types';
+import { ChannelVoicePrefix, MIDIChannel, MIDIMessagePrefix, RawMidiMessage } from '../utils/types';
 
 const midiPrefixIsValid = (prefix: number): prefix is MIDIMessagePrefix => prefix >= 0b1000 && prefix <= 0b1111;
 
