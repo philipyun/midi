@@ -27,8 +27,8 @@ export const parseRawMIDIMessage = (message: Uint8Array): RawMidiMessage => {
 export const serializeRawMIDIMessage = (message: RawMidiMessage): Uint8Array => {
   const dataArray = [
     normalizeByte(message.status),
-    message.data1 ? normalizeByte(message.data1) : null,
-    message.data2 ? normalizeByte(message.data2) : null,
+    message.data1 !== undefined ? normalizeByte(message.data1) : null,
+    message.data2 !== undefined ? normalizeByte(message.data2) : null,
   ].filter(item => item !== null);
 
   return new Uint8Array(dataArray);
