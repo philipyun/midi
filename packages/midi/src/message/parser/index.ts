@@ -59,9 +59,9 @@ const parseChannelModeMessageType = (data1Byte: UInt7): ChannelModeType => {
 };
 
 const parseChannelMessage = (rawMIDIMessage: RawMidiMessage): ChannelVoiceMessage | ChannelModeMessage => {
-  const channelVoicePrefix = validateChannelVoicePrefix(rawMIDIMessage.status);
+  const channelVoicePrefix = validateChannelVoicePrefix(rawMIDIMessage.status >> 4);
   const channelMessageType = MIDIMessagePrefixMap[channelVoicePrefix];
-  const channel = validateChannelWord(rawMIDIMessage.status);
+  const channel = validateChannelWord(rawMIDIMessage.status & 0b00001111);
 
   // every channel voice/mode message has to have a data 1 byte
   const data1Byte = validateData1Byte(rawMIDIMessage);
@@ -92,7 +92,7 @@ const parseChannelMessage = (rawMIDIMessage: RawMidiMessage): ChannelVoiceMessag
 
 export const parseMIDIMessage = (rawMessage: Uint8Array) => {
   const statusByte = validateStatusByte(rawMessage);
-  const midiPrefix = validateMIDIPrefix(statusByte);
+  const midiPrefix = validateMIDIPrefix(statusByte >> 4);
   const midiMessageType = MIDIMessagePrefixMap[midiPrefix];
   if (midiMessageType === 'system') {
     return parseSystemMessage(rawMessage);
