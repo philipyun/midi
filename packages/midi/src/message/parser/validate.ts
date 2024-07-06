@@ -11,6 +11,15 @@ export const validateMIDIPrefix = (prefix: number): MIDIMessagePrefix => {
   throw new MIDIJsError('validateMIDIPrefix', 'MIDI message does not contain a valid status byte');
 };
 
+const prefixIsChannelVoice = (prefix: number): prefix is ChannelVoicePrefix => prefix >= 0b1000 && prefix <= 0b1110;
+
+export const validateChannelVoicePrefix = (prefix: number): ChannelVoicePrefix => {
+  if (prefixIsChannelVoice(prefix)) {
+    return prefix;
+  }
+  throw new MIDIJsError('parseRawChannelVoiceMessage', 'message is not a channel voice message');
+};
+
 export const validateStatusByte = (message: Uint8Array): number => {
   const statusByte = message[0];
   if (statusByte !== undefined) {
@@ -33,13 +42,4 @@ export const validateChannelWord = (channel: number): MIDIChannel => {
     return channel;
   }
   throw new MIDIJsError('validateChannelWord', 'midi channel is not valid -- but this should have never happened');
-};
-
-const prefixIsChannelVoice = (prefix: number): prefix is ChannelVoicePrefix => prefix >= 0b1000 && prefix <= 0b1110;
-
-export const validateChannelVoicePrefix = (prefix: number): ChannelVoicePrefix => {
-  if (prefixIsChannelVoice(prefix)) {
-    return prefix;
-  }
-  throw new MIDIJsError('parseRawChannelVoiceMessage', 'message is not a channel voice message');
 };

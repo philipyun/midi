@@ -1,7 +1,13 @@
 import { parseRawChannelVoiceMessage } from '../channel/voice';
 import { normalizeUInt7 } from '../utils';
-import { MIDIMessagePrefixMap, RawMidiMessage } from '../utils/types';
-import { validateData1Byte, validateMIDIPrefix, validateStatusByte } from './validate';
+import { ChannelModeMessage, ChannelVoiceMessage, MIDIMessagePrefixMap, RawMidiMessage } from '../utils/types';
+import {
+  validateChannelVoicePrefix,
+  validateChannelWord,
+  validateData1Byte,
+  validateMIDIPrefix,
+  validateStatusByte,
+} from './validate';
 
 /**
  * parses and converts a Uint8Array formatted MIDI message into a RawMidiMessage
@@ -21,20 +27,36 @@ const parseRawMIDIMessage = (status: number, data1Byte?: number, data2Byte?: num
 
 const parseSystemMessage = (rawMessage: Uint8Array) => {};
 
-const parseChannelMessage = (rawMIDIMessage: RawMidiMessage) => {
-  const midiPrefix = validateMIDIPrefix(rawMIDIMessage.status);
-  const midiMessageType = MIDIMessagePrefixMap[midiPrefix];
+const parseChannelMessage = (rawMIDIMessage: RawMidiMessage): ChannelVoiceMessage | ChannelModeMessage => {
+  const channelVoicePrefix = validateChannelVoicePrefix(rawMIDIMessage.status);
+  const channelMessageType = MIDIMessagePrefixMap[channelVoicePrefix];
+  const channel = validateChannelWord(rawMIDIMessage.status);
 
   // every channel voice/mode message has to have a data 1 byte
   const data1Byte = validateData1Byte(rawMIDIMessage);
+  const data2Byte = rawMIDIMessage.data2;
+
   // check if its a CC Message Prefix, since control change messages can be channel mode
-  if (midiMessageType === 'control-change') {
+  if (channelMessageType === 'control-change') {
     // now check if data1 is between 120-127, if we are, we're a channel mode message
     if (data1Byte >= 120 && data1Byte <= 127) {
-      // return parseChannelModeMessage
+      // TODO
+      return {
+        channel,
+        category: 'channel-mode',
+        data1: 120,
+        data2: 0,
+        type: 'all-notes-off',
+      };
     }
   }
-  return parseRawChannelVoiceMessage(rawMIDIMessage);
+  return {
+    channel,
+    category: 'channel-voice',
+    type: channelMessageType,
+    data1: data1Byte,
+    data2: data2Byte,
+  };
 };
 
 export const parseMIDIMessage = (rawMessage: Uint8Array) => {
